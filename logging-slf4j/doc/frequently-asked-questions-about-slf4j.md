@@ -107,3 +107,68 @@ TODO
   ... other dependency declarations
 </dependencies>
 ```
+
+#### 关于 SLF4J API
+##### 为什么 Logger 接口中的打印方法不接受Object类型的消息, 而只接受String类型的消息 ?
+TODO
+##### 可以在没有附带消息的情况下记录异常吗 ?
+TODO
+##### (不) 记录的最快方法是什么 ?
+SLF4J 支持称为参数化日志记录的高级功能, 可以显着提高禁用日志记录语句的日志记录性能; 对于一些 Logger 记录器记录:
+```
+logger.debug("Entry number: " + i + " is " + String.valueOf(entry[i]));
+```
+会有构造消息参数的成本, 无论是否记录消息都将整数 i 和 entry [i] 转换为 String, 并连接中间字符串  
+避免参数构造成本的一种可行的方法是使用判断包围日志语句, 以下是一个例子
+```
+if(logger.isDebugEnabled()) {
+  logger.debug("Entry number: " + i + " is " + String.valueOf(entry[i]));
+}
+```
+这样, 如果对记录器禁用调试, 则不会产生参数构造的成本; 另一方面, 如果为 DEBUG 级别启用了记录器, 则会产生评估记录器是否启用的成本两次: 一次在 debugEnabled 中, 一次在 debug 中; 这是一个无关紧要的开销, 因为评估记录器所花费的时间不到实际记录语句所需时间的 1%  
+更好的是使用参数化消息; 存在一个基于消息格式的便捷替代方案, 假设 entry 是一个对象, 你可以写:
+```
+Object entry = new SomeObject();
+logger.debug("The entry is {}.", entry);
+```
+在评估是否记录之后, 并且仅当决策是肯定的时, 记录器实现将格式化消息并用条目的字符串值替换 "{}" 对; 换句话说, 在禁用日志语句的情况下, 此语句不会产生参数构造的成本  
+以下两行将产生完全相同的输出; 但是, 在禁用日志记录语句的情况下, 第二种形式的性能将比第一种形式的性能至少提高 30 倍
+```
+logger.debug("The new entry is "+entry+".");
+logger.debug("The new entry is {}.", entry);
+```
+也可以使用两个参数, 例如可以写
+```
+logger.debug("The new entry is {}. It replaces {}.", entry, oldEntry);
+```
+如果需要传递三个或更多参数, 则可以使用打印方法的 Object... 变体, 例如可以写
+```
+logger.debug("Value {} was inserted between {} and {}.", newVal, below, above);
+```
+这种形式导致隐藏的构造 Object [] (对象数组) 的成本通常非常小; 一个和两个参数变体不会产生这种隐藏的成本, 并且仅仅因为这个原因而存在 (效率); Object... 变体使得 slf4j-api 更小/更干净; 另外还支持数组类型参数, 包括多维数组  s
+SLF4J 使用自己的消息格式化实现, 这与 Java 平台的格式不同; 这是合理的, 因为 SLF4J 的实现速度提高了大约 10 倍, 但代价是非标准且灵活性较低
+TODO
+
+##### 如何记录单个 (可能是复杂的) 对象的字符串内容 ?
+TODO
+##### 为什么 org.slf4j.Logger 接口没有 FATAL 级别的方法 ?
+TODO
+##### 为什么 TRACE 级别仅在 SLF4J 版本 1.4.0 中引入 ?
+TODO
+##### SLF4J 日志 API 是否支持 I18N (国际化) ?
+TODO
+##### 是否可以在不通过 LoggerFactory 中的静态方法的情况下检索记录器 ?
+TODO
+##### 在存在 exception/throwable 的情况下, 是否可以参数化日志语句 ?
+
+#### 事项 SLF4J API
+##### 如何使我的日志框架与 SLF4J 兼容 ?
+TODO
+##### 我的日志系统如何添加对 Marker 接口的支持 ?
+TODO
+
+#### 关于日志记录的通用问题
+TODO
+
+>**参考:**
+[Frequently Asked Questions about SLF4J](https://www.slf4j.org/faq.html#what_is)
