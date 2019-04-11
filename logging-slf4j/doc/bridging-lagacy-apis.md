@@ -32,5 +32,5 @@ jul-to-slf4j.jar 构件包括一个 java.util.logging (jul) 处理器, 即 SLF4J
 - 安装了 LevelChangePropagator
 ##### jul-to-slf4j.jar 和 slf4j-jdk14.jar 不应同时使用
 slf4j-jdk14.jar 的存在将强制将 SLF4J 调用委托给 jul; 另一方面, 通过调用 "SLF4JBridgeHandler.install()", jul-to-slf4j.jar 的存在以及 SLF4JBridgeHandler 的安装将把 jul 记录路由到 SLF4J; 因此, 如果两个 jar 同时存在 (并且安装了 SLF4JBridgeHandler), 则 slf4j 调用将被委托给 jul, jul 记录将被路由到 SLF4J, 从而产生无限循环
->**参考:**
+>**参考:**  
 [Bridging legacy APIs](https://www.slf4j.org/legacy.html)
