@@ -20,7 +20,7 @@ JCL 使用两种基本的抽象: `Log` (基本记录器) 和 `LogFactory` (知�
 - 查找名为 `org.apache.commons.logging.Log` 的系统属性 (为了向后兼容此 API 的 1.0 之前的版本, 还会查询系统属性 `org.apache.commons.logging.log`)
 - 如果 Log4J 日志记录系统在应用程序类路径中可用, 请使用相应的包装类 ([Log4JLogger](http://commons.apache.org/logging/apidocs/org/apache/commons/logging/impl/Jdk14Logger.html))
 - 如果应用程序在 JDK 1.4 系统上执行, 请使用相应的包装类 ([Jdk14Logger](http://commons.apache.org/logging/apidocs/org/apache/commons/logging/impl/Jdk14Logger.html))
-- 回退到默认的简单日志包装器 ([SimpleLog])(http://commons.apache.org/logging/apidocs/org/apache/commons/logging/impl/SimpleLog.html))
+- 回退到默认的简单日志包装器 ([SimpleLog](http://commons.apache.org/logging/apidocs/org/apache/commons/logging/impl/SimpleLog.html))
 
 组件随附的各种 `Log` 实现的详细信息, 请参阅 JCL javadocs (发现过程也有更详细的介绍)
 
@@ -30,3 +30,23 @@ JCL 行为的配置最终取决于所使用的日志工具包; 请参阅所选�
 JCL 不负责底层日志库的初始化, 配置或关闭; 在许多情况下, 日志库将在首次使用时自动初始化/配置, 并且不需要显式关闭过程; 在这些情况下, 应用程序可以简单地使用 JCL, 而不是以任何方式直接依赖于底层日志记录系统的 API;但如果使用的日志库需要特殊的初始化, 配置或关闭, 那么应用程序中将需要一些特定于日志库的代码; JCL 只是将日志记录方法调用转发给正确的底层实现; 在编写库代码时, 此问题并不相关, 因为调用应用程序会负责处理此问题
 
 #### 配置 Log4j
+Log4J 是一种非常常用的日志记录实现 (以及作为JCL的主要默认设置), 因此本文提供了一些细节以使开发人员/集成人员使用; 有关 Log4J 及其配置的更多详细信息, 请参阅 [Log4J Homz](http://logging.apache.org/log4j/docs/index.html)  
+使用系统属性和/或属性文件配置 Log4J:
+- `log4j.configuration = log4j.properties` 使用此系统属性指定 Log4J 配置文件的名称; 如果未指定, 则默认配置文件为 log4j.properties
+- `log4j.rootCategory=priority [, appender]*`, 设置默认 (根) 记录器优先级
+- `log4j.logger.logger.name = priority` 设置指定记录器的优先级以及所有记录器的层次结构低于或低于命名记录器的优先级; logger.name 对应于 `LogFactory.getLog(logger.name)` 的参数, 用于创建记录器实例; 优先级为: DEBUG, INFO, WARN, ERROR 或 FATAL; Log4J 了解层次结构名称, 允许通过包或高级限定符进行控制: `log4j.logger.org.apache.component = DEBUG `将为 `org.apache.component` 和 `org.apache.component.sub` 中的所有类启用调试消息; 同样, 设置 `log4j.logger.org.apache.component = DEBUG` 将为所有 "组件" 类启用调试消息, 但不为其他 Apache 项目启用调试消息
+- `log4j.appender.appender.Threshold=priority`, Log4J appender 对应于不同的输出设备: 控制台, 文件, 套接字等; 如果 appender 的阈值小于或等于消息优先级, 则消息由该 appender 写入; 这允许不同级别的细节出现在不同的日志目的地; 例如: 可以在日志文件中捕获 DEBUG (和更高级别) 级别信息, 同时将控制台输出限制为 INFO (和更高级别)
+
+#### 使用 JCL 开发
+TODO
+
+#### Jars 包含在标准分布版中
+##### commons-logging.jar
+`commons-logging.jar` 文件包括 JCL API, 默认 `LogFactory` 实现和以及 Log4J, Avalon LogKit，Avalon Framework的日志记录基础结构的精简包装日志实现, 以及 JDK 1.4 日志 API 的实现 (JSR-47), 对于 1.4 之前的系统
+在大多数情况下, 包括 `commons-logging.jar` 和类路径中首选的日志记录实现应该是使用 JCL 所需的全部内容
+##### commons-logging-api.jar
+TODO
+##### commons-logging-adapters.jar
+TODO
+
+#### JCL 最佳实践
