@@ -50,3 +50,16 @@ TODO
 TODO
 
 #### JCL 最佳实践
+TODO
+
+#### 扩展 Commons Logging
+TODO
+
+#### 简单日志快速指南
+TODO
+
+#### 常见问题解答
+见 [FAQ 文档](http://wiki.apache.org/commons/Logging/FrequentlyAskedQuestions)
+
+>**参考:**  
+[User Guide](https://commons.apache.org/proper/commons-logging/guide.html)
